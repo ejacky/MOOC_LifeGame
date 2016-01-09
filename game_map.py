@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# @author XiaoTu
+# @author jackyzhang
 
 import random
 import sys
@@ -19,17 +19,9 @@ class GameMap(object):
     """
     
     MAX_MAP_SIZE = 100
+    CELL_ALIVE = 1
     MAX_CELL_VALUE = 1
     MIN_CELL_VALUE = 0
-    DIRECTIONS = (
-        (0, 1, ),
-        (1, -1, ),
-        (-1, 0, ),
-        (1, -1, ),
-        (-1, -1, ),
-        (-1, 0, ),
-        (-1, -1, ),
-    )
 
     def __init__(self, rows, cols):
         """Inits GameMap with row and column count."""
@@ -75,16 +67,23 @@ class GameMap(object):
         Returns:
             Count of live neighbor cells
         """
-        count = 0
-        for d in self.DIRECTIONS:
-            d_row = row + d[0]
-            d_col = col + d[1]
-            if d_row >= self.rows:
-                d_row -= self.rows
-            if d_col >= self.cols:
-                d_col -= self.cols
-            count += self.cells[d_col][d_row]
-        return count
+        DIRECTION = {
+            "up": (-1, 0),
+            "up_up": (-2, 0),
+            "down": (1, 0),
+            "down_down": (2, 0),
+            "left": (0, -1),
+            "left_left": (0, -2),
+            "right": (0, 1),
+            "right_right": (0, 2),
+        }
+        counter = 0
+        for dire in DIRECTION:
+            trow = (row + DIRECTION[dire][0]) % self.rows
+            tcol = (col + DIRECTION[dire][1]) % self.cols
+            if self.cells[trow][tcol] == GameMap.CELL_ALIVE:
+                counter += 1
+        return counter
 
     def get_neighbor_count_map(self):
         """Get count of neighbors of every cell in the map.
